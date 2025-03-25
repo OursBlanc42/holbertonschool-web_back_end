@@ -1,4 +1,4 @@
-import Currency from "./3-currency";
+import Currency from './3-currency';
 
 export default class Pricing {
   constructor(amount, currency) {
@@ -6,7 +6,6 @@ export default class Pricing {
     this._currency = currency;
   }
 
-  // Amount getter and setter
   get amount() {
     return this._amount;
   }
@@ -15,7 +14,6 @@ export default class Pricing {
     this._amount = value;
   }
 
-  // Amount getter and setter
   get currency() {
     return this._currency;
   }
@@ -24,13 +22,14 @@ export default class Pricing {
     this._currency = value;
   }
 
-  // Method to display amount with currency
   displayFullPrice() {
     return `${this._amount} ${this._currency.displayFullCurrency()}`;
   }
 
-  // Method to convert price based on conversion rate
-  convertPrice(amount, conversionRate) {
-    return this.amount * conversionRate;
+  static convertPrice(amount, conversionRate) {
+    if (typeof amount !== 'number' || typeof conversionRate !== 'number') {
+      throw new TypeError('Amount and conversion rate must be numbers');
+    }
+    return amount * conversionRate;
   }
 }

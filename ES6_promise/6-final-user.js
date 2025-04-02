@@ -7,11 +7,9 @@ export default function handleProfileSignup(firstName, lastName, fileName) {
     Promise.allSettled([uploadPhoto(fileName), signUpUser(firstName, lastName)])
 
       // For all returned promise, log data :
-      .then((results) =>
-        results.map((result) => ({
-          status: result.status,
-          value: result.value || result.reason,
-        }))
-      )
+      .then((results) => ({
+        status: results.status,
+        value: results.value || results.reason,
+      }))
   );
 }

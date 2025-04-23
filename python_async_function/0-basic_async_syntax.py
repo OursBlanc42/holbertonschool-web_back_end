@@ -18,4 +18,4 @@ async def wait_random(max_delay: Union[int, float] = 10) -> float:
     """
     delay = random.uniform(0, max_delay)
     await asyncio.sleep(delay)
-    return (delay)
+    return delay

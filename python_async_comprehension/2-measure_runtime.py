@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-module witch measure_time function
+Measures runtime of executing four
+instances of async_comprehension concurrently.
 """
 import asyncio
 import time

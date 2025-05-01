@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
+"""
+Implement a method named get_page that takes two integer arguments:
+page (default 1) and page_size (default 10).
+"""
 import csv
+import math  # noqa: F401
 from typing import List
 from typing import Tuple
 
@@ -43,7 +48,8 @@ class Server:
 
     def get_page(self, page: int = 1, page_size: int = 10) -> List[List]:
         """
-            Check the type and the value of input
+            Validate the input types and values.
+            Then load the data set and return it
         """
         assert isinstance(page, int) and page > 0
         assert isinstance(page_size, int) and page_size > 0

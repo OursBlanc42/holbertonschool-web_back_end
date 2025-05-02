@@ -5,7 +5,7 @@ Deletion-resilient hypermedia pagination
 
 import csv
 import math  # noqa: F401
-from typing import Dict, List
+from typing import Dict, List, Any
 
 
 class Server:
@@ -39,65 +39,38 @@ class Server:
             }
         return self.__indexed_dataset
 
-    def get_hyper_index(self, index: int = 0, page_size: int = 10) -> Dict:
+    def get_hyper_index(
+            self, index: int = 0, page_size: int = 10) -> Dict[str, Any]:
         """
-        Retrieves a page of data from the indexed dataset starting from a
-        given index.
-        Ensures deletion resilience pagination, meaning it works correctly
-        even if some entries are deleted.
+        Get page data resilient to deletions in the dataset.
+
         Args:
-            index (int, optional): The starting index for data retrieval.
-            Defaults to 0.
-            page_size (int, optional): The number of items to
-            retrieve per page.
-            Defaults to 10.
+            index (int): the starting index
+            page_size (int): number of items per page
 
         Returns:
-            Dict: A dictionary with the following keys:
-                - index (int): The starting index of the current page.
-                - next_index (int): The index for the next page of data.
-                - page_size (int): The number of items in the current page.
-                - data (List[List]): The list of data items for the
-                current page.
+            Dict[str, Any]: dictionary with index,
+            next_index, page_size and data
         """
-        # Retrieve the indexed dataset from the Server class
+        assert isinstance(index, int) and index >= 0
+
         indexed_data = self.indexed_dataset()
-        keys = list(indexed_data.keys())
+        assert index < max(indexed_data.keys()) + 1
 
-        # Ensure the index is an integer and in the valid range
-        assert isinstance(index, int)
-        assert 0 <= index < len(self.dataset())
-        assert index + page_size < len(self.dataset())
-
-        # Determine the starting index
-        if index not in indexed_data:
-            start = keys[index]
-        else:
-            start = index
-
+        keys = sorted(indexed_data.keys())
         data = []
-        next_index = start
-        collected = 0
+        next_index = index
+        count = 0
 
-        # Collect items until the desired page size is reached
-        while collected < page_size:
-            # Check if the current next_index exists in the indexed dataset
+        while count < page_size and next_index <= keys[-1]:
             if next_index in indexed_data:
-                # Append the data at the current next_index to the data list
                 data.append(indexed_data[next_index])
-                # Increment the collected counter
-                collected += 1
-            # Move to the next index
+                count += 1
             next_index += 1
-
-        # Calculate the next index for the next page
-        next_index = index + page_size
-        if index not in keys:
-            next_index = keys[next_index]
 
         return {
             "index": index,
             "next_index": next_index,
-            "page_size": page_size,
+            "page_size": len(data),
             "data": data
         }

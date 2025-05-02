@@ -5,7 +5,7 @@ Deletion-resilient hypermedia pagination
 
 import csv
 import math  # noqa: F401
-from typing import Dict, List, Any
+from typing import Dict, List
 
 
 class Server:
@@ -39,9 +39,9 @@ class Server:
             }
         return self.__indexed_dataset
 
-    def get_hyper_index(
-            self, index: int = 0, page_size: int = 10) -> Dict[str, Any]:
-        """Returns a deletion-resilient page of the dataset.
+    def get_hyper_index(self, index: int = None, page_size: int = 10) -> Dict:
+        """
+        Returns a deletion-resilient page of the dataset.
 
         Args:
             index (int): Starting index. Defaults to 0.
@@ -51,22 +51,28 @@ class Server:
             Dict[str, Any]: page data including index,
             next_index, page_size and data
         """
-        assert isinstance(index, int) and isinstance(page_size, int)
-        assert 0 <= index < len(self.dataset())
+        # check the input
+        assert(type(index) == int and type(page_size) == int)
+        assert(0 <= index < len(self.dataset()))
 
         dataset = self.indexed_dataset()
         data = []
         next_index = index
 
-        for _ in range(page_size):
-            while next_index not in dataset:
-                next_index += 1
-            data.append(dataset[next_index])
+        # Move forward until valid data is found if index is deleted
+        while dataset.get(next_index) is None:
+            next_index += 1
+
+        # Add valid items until reaching page_size
+        while len(data) < page_size:
+            item = dataset.get(next_index)
+            if item is not None:
+                data.append(item)
             next_index += 1
 
         return {
-            "index": index,
-            "next_index": next_index,
-            "page_size": page_size,
-            "data": data
+            'index': index,
+            'next_index': next_index,
+            'page_size': page_size,
+            'data': data
         }

@@ -41,36 +41,32 @@ class Server:
 
     def get_hyper_index(
             self, index: int = 0, page_size: int = 10) -> Dict[str, Any]:
-        """
-        Get page data resilient to deletions in the dataset.
+        """Returns a deletion-resilient page of the dataset.
 
         Args:
-            index (int): the starting index
-            page_size (int): number of items per page
+            index (int): Starting index. Defaults to 0.
+            page_size (int): Number of items per page. Defaults to 10.
 
         Returns:
-            Dict[str, Any]: dictionary with index,
+            Dict[str, Any]: page data including index,
             next_index, page_size and data
         """
-        assert isinstance(index, int) and index >= 0
+        assert isinstance(index, int) and isinstance(page_size, int)
+        assert 0 <= index < len(self.dataset())
 
-        indexed_data = self.indexed_dataset()
-        assert index < max(indexed_data.keys()) + 1
-
-        keys = sorted(indexed_data.keys())
+        dataset = self.indexed_dataset()
         data = []
         next_index = index
-        count = 0
 
-        while count < page_size and next_index <= keys[-1]:
-            if next_index in indexed_data:
-                data.append(indexed_data[next_index])
-                count += 1
+        for _ in range(page_size):
+            while next_index not in dataset:
+                next_index += 1
+            data.append(dataset[next_index])
             next_index += 1
 
         return {
             "index": index,
             "next_index": next_index,
-            "page_size": len(data),
+            "page_size": page_size,
             "data": data
         }

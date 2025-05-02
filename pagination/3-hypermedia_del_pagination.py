@@ -5,7 +5,7 @@ Deletion-resilient hypermedia pagination
 
 import csv
 import math  # noqa: F401
-from typing import Dict, List
+from typing import Dict, List, Any
 
 
 class Server:
@@ -39,32 +39,42 @@ class Server:
             }
         return self.__indexed_dataset
 
-    def get_hyper_index(self, index: int = 0, page_size: int = 10) -> Dict:
+    def get_hyper_index(
+        self, index: int = 0, page_size: int = 10
+    ) -> Dict[str, Any]:
         """
-        Deletion-resilient hypermedia pagination.
-        Returns a page of data starting from a specific index,
-        skipping missing entries.
+        Returns a deletion-resilient page of the dataset.
+
+        Args:
+            index (int): Starting index. Defaults to 0.
+            page_size (int): Number of items per page. Defaults to 10.
+
+        Returns:
+            Dict[str, Any]: page data including index,
+            next_index, page_size and data
         """
-        # check input
-        assert isinstance(index, int)
-        assert isinstance(page_size, int)
-        assert 0 <= index < len(self.dataset())
+        # check the input
+        assert (isinstance(index, int) and isinstance(page_size, int))
+        assert (0 <= index < len(self.dataset()))
 
         dataset = self.indexed_dataset()
-        data = []
-        current_index = index
-        collected = 0
+        data: List[List[Any]] = []
+        next_index = index
 
-        # Collect exactly page_size existing entries
-        while collected < page_size and current_index <= max(dataset.keys()):
-            if current_index in dataset:
-                data.append(dataset[current_index])
-                collected += 1
-            current_index += 1
+        # Move forward until valid data is found if index is deleted
+        while dataset.get(next_index) is None:
+            next_index += 1
+
+        # Add valid items until reaching page_size
+        while len(data) < page_size:
+            item = dataset.get(next_index)
+            if item is not None:
+                data.append(item)
+            next_index += 1
 
         return {
-            "index": index,
-            "next_index": current_index,
-            "page_size": len(data),
-            "data": data
+            'index': index,
+            'next_index': next_index,
+            'page_size': page_size,
+            'data': data
         }

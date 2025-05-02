@@ -62,13 +62,21 @@ class Server:
         """
         # Retrieve the indexed dataset from the Server class
         indexed_data = self.indexed_dataset()
+        keys = list(indexed_data.keys())
 
         # Ensure the index is an integer and in the valid range
         assert isinstance(index, int)
         assert 0 <= index < len(self.dataset())
+        assert index + page_size < len(self.dataset())
+
+        # Determine the starting index
+        if index not in indexed_data:
+            start = keys[index]
+        else:
+            start = index
 
         data = []
-        next_index = index
+        next_index = start
         collected = 0
 
         # Collect items until the desired page size is reached
@@ -81,6 +89,11 @@ class Server:
                 collected += 1
             # Move to the next index
             next_index += 1
+
+        # Calculate the next index for the next page
+        next_index = index + page_size
+        if index not in keys:
+            next_index = keys[next_index]
 
         return {
             "index": index,

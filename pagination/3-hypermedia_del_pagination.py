@@ -39,9 +39,7 @@ class Server:
             }
         return self.__indexed_dataset
 
-    def get_hyper_index(
-        self, index: int = 0, page_size: int = 10
-    ) -> Dict[str, Any]:
+    def get_hyper_index(self, index: int = None, page_size: int = 10) -> Dict:
         """
         Returns a deletion-resilient page of the dataset.
 
@@ -53,11 +51,18 @@ class Server:
             Dict[str, Any]: page data including index,
             next_index, page_size and data
         """
-        # check the input
-        assert (isinstance(index, int) and isinstance(page_size, int))
-        assert (0 <= index < len(self.dataset()))
 
+        # Set default index to 0 if None
+        if index is None:
+            index = 0
+
+        # Get indexed dataset
         dataset = self.indexed_dataset()
+        dataset_size = len(dataset)
+
+        # Assert index is in valid range
+        assert isinstance(index, int) and 0 <= index < dataset_size
+
         data: List[List[Any]] = []
         next_index = index
 

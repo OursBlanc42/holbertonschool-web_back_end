@@ -1,5 +1,5 @@
-function displayMessage(input) {
-  console.log(input);
+function displayMessage(myvsupervariable) {
+  console.log(myvsupervariable);
 }
 
 module.exports = displayMessage;

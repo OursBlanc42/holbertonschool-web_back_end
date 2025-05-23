@@ -34,6 +34,7 @@ const app = http.createServer((req, res) => {
         res.end('Cannot load the database');
       });
   }
-}).listen(1245);
+});
+app.listen(1245);
 
 module.exports = app;

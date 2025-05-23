@@ -10,6 +10,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/students', (req, res) => {
+  res.set('Content-Type', 'text/plain');
   const text = 'This is the list of our students\n';
   // save log to restore later
   const originalLog = console.log;

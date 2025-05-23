@@ -25,7 +25,7 @@ app.get('/students', (req, res) => {
     // restore original log and show answer
     .then(() => {
       console.log = originalLog;
-      res.send(text + output.trim());
+      res.send(text + output.trim() + '\n');
     })
     .catch(() => {
     // restore original log and show error message

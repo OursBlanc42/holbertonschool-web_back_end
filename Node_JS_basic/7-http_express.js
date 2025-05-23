@@ -5,6 +5,7 @@ const databasePath = process.argv[2];
 
 const app = express();
 app.get('/', (req, res) => {
+  res.set('Content-Type', 'text/plain');
   res.send('Hello Holberton School!');
 });
 
